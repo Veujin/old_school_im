@@ -1,0 +1,32 @@
+<div class='chat-list'>
+    {% if chats_page %}
+        Here's your chats:
+    {% endif %}
+    {% for chat in chats_page %}
+        <a  href="{% url 'im:chat' chat.id %}">
+            <div class='chat-item'>
+                <span><b>{{ chat.chat_name }}</b></span>
+                </br>
+                <span>{{ chat.last_message.text }}</span>
+            </div>
+        </a>
+    {% empty %}
+        <div>No chats_page yet.</div>
+    {% endfor %}
+</div>
+
+<div class="pagination">
+  {% if chats_page.has_previous %}
+    <a href="?page=1">First</a>
+    <a href="?page={{ chats_page.previous_page_number }}">Previous</a>
+  {% endif %}
+
+  <span>{{ chats_page.number }}</span>
+  <span>of</span>
+  <span>{{ chats_page.paginator.num_pages }}</span>
+
+  {% if chats_page.has_next %}
+    <a href="?page={{ chats_page.next_page_number }}">Next</a>
+    <a href="?page={{ chats_page.paginator.num_pages }}">Last</a>
+  {% endif %}
+</div>
