@@ -1,0 +1,3 @@
+Если в при миграции позникнет ошибка No module named 'psycopg2', то можно установить его pip3 install psycopg2
+python3 manage.py createsuperuser
+python3 manage.py migrate
