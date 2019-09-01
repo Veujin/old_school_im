@@ -1,32 +1,34 @@
 <div class='chat-list'>
-    {% if chats_page %}
+    {% if chats %}
         Here's your chats:
     {% endif %}
-    {% for chat in chats_page %}
+    {% for chat in chats %}
         <a  href="{% url 'im:chat' chat.id %}">
             <div class='chat-item'>
-                <span><b>{{ chat.chat_name }}</b></span>
+                {% for user in chat.users.all %}
+                  <span><b>{{ user.username }}</b></span>
+                {% endfor %}
                 </br>
-                <span>{{ chat.last_message.text }}</span>
+                <span>{{ chat.message_set.last.text }}</span>
             </div>
         </a>
     {% empty %}
-        <div>No chats_page yet.</div>
+        <div>No chats yet.</div>
     {% endfor %}
 </div>
 
 <div class="pagination">
-  {% if chats_page.has_previous %}
+  {% if page_obj.has_previous %}
     <a href="?page=1">First</a>
-    <a href="?page={{ chats_page.previous_page_number }}">Previous</a>
+    <a href="?page={{ page_obj.previous_page_number }}">Previous</a>
   {% endif %}
 
-  <span>{{ chats_page.number }}</span>
+  <span>{{ page_obj.number }}</span>
   <span>of</span>
-  <span>{{ chats_page.paginator.num_pages }}</span>
+  <span>{{ page_obj.paginator.num_pages }}</span>
 
-  {% if chats_page.has_next %}
-    <a href="?page={{ chats_page.next_page_number }}">Next</a>
-    <a href="?page={{ chats_page.paginator.num_pages }}">Last</a>
+  {% if page_obj.has_next %}
+    <a href="?page={{ page_obj.next_page_number }}">Next</a>
+    <a href="?page={{ page_obj.paginator.num_pages }}">Last</a>
   {% endif %}
 </div>
