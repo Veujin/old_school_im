@@ -1,40 +1,54 @@
-<form action="{% url 'im:chat-list' %}" method="post">
-    {% csrf_token %}
-    <input type="input" name="username" id="message_input" value="">
-    <input type="submit" value="Add">
-</form>
+{% extends "im/base.html" %}
 
-<div class='chat-list'>
-    {% if chats %}
-        Here's your chats:
+{% block title %}
+  <title>Old school IM</title>
+{% endblock %}
+
+{% block content %}
+  <div>
+    <form action="{% url 'im:chat-list' %}" method="post">
+        {% csrf_token %}
+        <input type="input" name="username" id="message_input" value="">
+        <input type="submit" value="Add user">
+    </form>
+  </div>
+  <div>
+      <table class="table">
+        {% for chat in chats %}
+          <tr>
+            <td>
+              <a  href="{% url 'im:chat' chat.id %}">
+                  {% for user in chat.users.all %}
+                    <span><b>{{ user.username }}</b></span>
+                  {% endfor %}
+              </a>
+            </td>
+            <td>
+              {{ chat.message_set.last.text }}
+            </td>
+            <td>
+              {{ chat.message_set.last.sent_date | time }}
+            </td>
+          </tr>
+        {% empty %}
+            <div>No chats yet.</div>
+        {% endfor %}
+      </table>
+  </div>
+
+  <div class="pagination">
+    {% if page_obj.has_previous %}
+      <a href="?page=1">First</a>
+      <a href="?page={{ page_obj.previous_page_number }}">Previous</a>
     {% endif %}
-    {% for chat in chats %}
-        <a  href="{% url 'im:chat' chat.id %}">
-            <div class='chat-item'>
-                {% for user in chat.users.all %}
-                  <span><b>{{ user.username }}</b></span>
-                {% endfor %}
-                </br>
-                <span>{{ chat.message_set.last.text }}</span>
-            </div>
-        </a>
-    {% empty %}
-        <div>No chats yet.</div>
-    {% endfor %}
-</div>
 
-<div class="pagination">
-  {% if page_obj.has_previous %}
-    <a href="?page=1">First</a>
-    <a href="?page={{ page_obj.previous_page_number }}">Previous</a>
-  {% endif %}
+    <span>{{ page_obj.number }}</span>
+    <span>of</span>
+    <span>{{ page_obj.paginator.num_pages }}</span>
 
-  <span>{{ page_obj.number }}</span>
-  <span>of</span>
-  <span>{{ page_obj.paginator.num_pages }}</span>
-
-  {% if page_obj.has_next %}
-    <a href="?page={{ page_obj.next_page_number }}">Next</a>
-    <a href="?page={{ page_obj.paginator.num_pages }}">Last</a>
-  {% endif %}
-</div>
+    {% if page_obj.has_next %}
+      <a href="?page={{ page_obj.next_page_number }}">Next</a>
+      <a href="?page={{ page_obj.paginator.num_pages }}">Last</a>
+    {% endif %}
+  </div>
+{% endblock %}

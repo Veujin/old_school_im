@@ -1,33 +1,57 @@
-<div>
+{% extends "im/base.html" %}
+
+{% block title %}
+  <title>
+    {% for companion in companions %}
+      {{ companion.username }}
+    {% endfor %}
+  </title>
+{% endblock %}
+
+{% block content %}
+ <div>
+    <span>Chat with </span>
     {% for companion in companions %}
             <span><b>{{ companion.username }}</b></span>
     {% endfor %}
-    {% for message in messages %}
-        <div class='message-item'>
-            <span><b>{{ message.owner.username }}</b></span>
-            <span>{{ message.text }}</span>
-        </div>
-    {% empty %}
-        <div>No messages yet.</div>
-    {% endfor %}
-</div>
-<div class="pagination">
-  {% if page_obj.has_previous %}
-    <a href="?page=1">First</a>
-    <a href="?page={{ page_obj.previous_page_number }}">Previous</a>
-  {% endif %}
+  </div>
+  <form action="{% url 'im:chat' chat.id %}" method="post">
+      {% csrf_token %}
+      <input type="input" name="message" id="message_input" value="">
+      <input type="submit" value="Send message">
+  </form>
+  <div>
+    <table class='table'>
+      {% for message in messages %}
+        <tr>
+          <td>
+            <b>{{ message.owner.username }}</b>
+          </td>
+          <td>
+            {{ message.text }}
+          </td>
+          <td>
+            {{ message.sent_date | time }}
+          </td>
+        </tr>
+      {% empty %}
+          <div>No messages yet.</div>
+      {% endfor %}
+    </table>
+  </div>
+  <div class="pagination">
+    {% if page_obj.has_previous %}
+      <a href="?page=1">First</a>
+      <a href="?page={{ page_obj.previous_page_number }}">Previous</a>
+    {% endif %}
 
-  <span>{{ page_obj.number }}</span>
-  <span>of</span>
-  <span>{{ page_obj.paginator.num_pages }}</span>
+    <span>{{ page_obj.number }}</span>
+    <span>of</span>
+    <span>{{ page_obj.paginator.num_pages }}</span>
 
-  {% if page_obj.has_next %}
-    <a href="?page={{ page_obj.next_page_number }}">Next</a>
-    <a href="?page={{ page_obj.paginator.num_pages }}">Last</a>
-  {% endif %}
-</div>
-<form action="{% url 'im:chat' chat.id %}" method="post">
-    {% csrf_token %}
-    <input type="input" name="message" id="message_input" value="">
-    <input type="submit" value="Send">
-</form>
+    {% if page_obj.has_next %}
+      <a href="?page={{ page_obj.next_page_number }}">Next</a>
+      <a href="?page={{ page_obj.paginator.num_pages }}">Last</a>
+    {% endif %}
+  </div>
+{% endblock %}
