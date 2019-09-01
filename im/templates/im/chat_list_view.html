@@ -1,3 +1,9 @@
+<form action="{% url 'im:chat-list' %}" method="post">
+    {% csrf_token %}
+    <input type="input" name="username" id="message_input" value="">
+    <input type="submit" value="Add">
+</form>
+
 <div class='chat-list'>
     {% if chats %}
         Here's your chats:

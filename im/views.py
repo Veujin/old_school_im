@@ -1,10 +1,10 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import get_object_or_404
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.views import generic
-from django.http import HttpResponse
-from django.core.paginator import Paginator
 from django.utils import timezone
+from django.contrib.auth.models import User
+from django.core.exceptions import ObjectDoesNotExist
 from .models import Chat, Message
 
 class ChatsView(generic.ListView):
@@ -13,9 +13,43 @@ class ChatsView(generic.ListView):
     paginate_by = 20
     template_name = 'im/chat_list_view.html'
 
+
     def get_queryset(self):
         user = self.request.user
         return user.chat_set.all()
+
+    
+    def post(self, request, *args, **kwargs):
+        try:
+            new_user = User.objects.get(username=request.POST['username'])
+        except ObjectDoesNotExist:
+            return HttpResponseRedirect(reverse('im:chat-list'))
+
+        users_only_chats = self.__get_users_only_chats(request.user, new_user)
+        
+        if users_only_chats:
+            return HttpResponseRedirect(reverse(
+                'im:chat', 
+                args=(users_only_chats[0].id,)))
+        
+        if not users_only_chats:
+            new_chat = Chat.objects.create()
+            new_chat.users.add(new_user)
+            new_chat.users.add(request.user)
+            return HttpResponseRedirect(reverse(
+                'im:chat', 
+                args=(new_chat.id,)))
+
+        return HttpResponseRedirect(reverse('im:chat-list'))
+
+    
+    def __get_users_only_chats(self, user1, user2):
+        user1_chats = user1.chat_set.all()
+        user2_chats = user2.chat_set.all()
+
+        users_chats_intersection = user1_chats & user2_chats
+        return [c for c in users_chats_intersection 
+                            if set(c.users.all()) == set([user1, user2])]
     
 
 class ChatMessagesView(generic.ListView):
