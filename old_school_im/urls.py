@@ -20,5 +20,6 @@ from django.views.generic import RedirectView
 urlpatterns = [
     path('', RedirectView.as_view(pattern_name='im:chat-list', permanent=False)),
     path('admin/', admin.site.urls),
+    path('accounts/', include('login.urls')),
     path('im/', include('im.urls'))
 ]
