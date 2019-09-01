@@ -78,10 +78,9 @@ class ChatMessagesView(generic.ListView):
     def post(self, request, *args, **kwargs):
         chat = get_object_or_404(Chat, pk=kwargs['chat_id'])
         user = request.user
+        message = request.POST['message']
 
         self.__update_messages_unread(chat, user)
-
-        message = request.POST['message']
 
         chat.message_set.create(owner=user, text=message, sent_date=timezone.now())
 

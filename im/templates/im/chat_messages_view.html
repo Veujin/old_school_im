@@ -9,18 +9,26 @@
 {% endblock %}
 
 {% block content %}
- <div>
+  <div class='row mt-3'>
     <span>Chat with </span>
     {% for companion in companions %}
-            <span><b>{{ companion.username }}</b></span>
+            <b>{{ companion.username }}</b>
     {% endfor %}
   </div>
-  <form action="{% url 'im:chat' chat.id %}" method="post">
-      {% csrf_token %}
-      <input type="input" name="message" id="message_input" value="">
-      <input type="submit" value="Send message">
-  </form>
-  <div>
+  <div class='row mt-3'>
+    <div class='col-12'>
+      <form action="{% url 'im:chat' chat.id %}" method="post">
+          {% csrf_token %}
+          <div class='input-group'>
+            <input placeholder='message' class='form-control' type="input" name="message" id="message_input" value="">
+            <div class="input-group-append">
+              <input class="btn btn-outline-secondary" type="submit" value="Send message">
+            </div>
+          </div>
+      </form>
+    </div>
+  </div>
+  <div class='row mt-3'>
     <table class='table'>
       {% for message in messages %}
         <tr>
@@ -39,19 +47,37 @@
       {% endfor %}
     </table>
   </div>
-  <div class="pagination">
-    {% if page_obj.has_previous %}
-      <a href="?page=1">First</a>
-      <a href="?page={{ page_obj.previous_page_number }}">Previous</a>
-    {% endif %}
+  <div class='row mt-3'>
+    <div class="col-4">
+      {% if page_obj.has_previous %}
+        <div class="input-group">
+          <div class="input-group-prepend"> 
+            <a class="btn btn-outline-secondary" href="?page=1">First</a>
+          </div>
+          <div class="input-group-append">
+            <a class="btn btn-outline-secondary" href="?page={{ page_obj.previous_page_number }}">Previous</a>
+          </div>
+        </div>
+      {% endif %}
+    </div>
 
-    <span>{{ page_obj.number }}</span>
-    <span>of</span>
-    <span>{{ page_obj.paginator.num_pages }}</span>
+    <div class='col-4 text-center'>
+      <span>{{ page_obj.number }}</span>
+      <span>page of</span>
+      <span>{{ page_obj.paginator.num_pages }}</span>
+    </div>
 
-    {% if page_obj.has_next %}
-      <a href="?page={{ page_obj.next_page_number }}">Next</a>
-      <a href="?page={{ page_obj.paginator.num_pages }}">Last</a>
-    {% endif %}
+    <div class='col-4'>
+      {% if page_obj.has_next %}
+        <div class="input-group">
+          <div class="input-group-prepend"> 
+            <a class="btn btn-outline-secondary" href="?page={{ page_obj.next_page_number }}">Next</a>
+          </div>
+          <div class="input-group-append">    
+            <a class="btn btn-outline-secondary" href="?page={{ page_obj.paginator.num_pages }}">Last</a>
+          </div>
+        </div>
+      {% endif %}
+    </div>
   </div>
 {% endblock %}
