@@ -78,8 +78,22 @@ class ChatMessagesView(generic.ListView):
     def post(self, request, *args, **kwargs):
         chat = get_object_or_404(Chat, pk=kwargs['chat_id'])
         user = request.user
+
+        self.__update_messages_unread(chat, user)
+
         message = request.POST['message']
 
         chat.message_set.create(owner=user, text=message, sent_date=timezone.now())
 
         return HttpResponseRedirect(reverse('im:chat', args=(kwargs['chat_id'],)))
+
+    
+    def __update_messages_unread(self, chat, current_user):
+        chat_to_user = chat.chattouser_set.get(user=current_user)
+        chat_to_user.messages_unread = 0
+        chat_to_user.save()
+
+        chats_to_usesr = chat.chattouser_set.exclude(user=current_user)
+        for cu in chats_to_usesr:
+            cu.messages_unread += 1
+            cu.save()
