@@ -26,7 +26,7 @@
     <a href="?page={{ messages_page.paginator.num_pages }}">Last</a>
   {% endif %}
 </div>
-<form action="{% url 'im:send' chat.id %}" method="post">
+<form action="{% url 'im:chat' chat.id %}" method="post">
     {% csrf_token %}
     <input type="input" name="message" id="message_input" value="">
     <input type="submit" value="Send">
