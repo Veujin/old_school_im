@@ -1,0 +1,33 @@
+<div>
+    {% for companion in companions %}
+            <span><b>{{ companion.username }}</b></span>
+    {% endfor %}
+    {% for message in messages_page %}
+        <div class='message-item'>
+            <span><b>{{ message.owner.username }}</b></span>
+            <span>{{ message.text }}</span>
+        </div>
+    {% empty %}
+        <div>No messages yet.</div>
+    {% endfor %}
+</div>
+<div class="pagination">
+  {% if messages_page.has_previous %}
+    <a href="?page=1">First</a>
+    <a href="?page={{ messages_page.previous_page_number }}">Previous</a>
+  {% endif %}
+
+  <span>{{ messages_page.number }}</span>
+  <span>of</span>
+  <span>{{ messages_page.paginator.num_pages }}</span>
+
+  {% if messages_page.has_next %}
+    <a href="?page={{ messages_page.next_page_number }}">Next</a>
+    <a href="?page={{ messages_page.paginator.num_pages }}">Last</a>
+  {% endif %}
+</div>
+<form action="{% url 'im:send' chat.id %}" method="post">
+    {% csrf_token %}
+    <input type="input" name="message" id="message_input" value="">
+    <input type="submit" value="Send">
+</form>
