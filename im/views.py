@@ -5,7 +5,7 @@ from django.views import generic
 from django.http import HttpResponse
 from django.core.paginator import Paginator
 from django.utils import timezone
-from .models import Chat
+from .models import Chat, Message
 
 
 def chats_list_view(request):
@@ -20,36 +20,40 @@ def chats_list_view(request):
         chat_usernames = [u.username for u in c.users.all()]
         chat_name = ', '.join([u for u in chat_usernames if u != user.username])
 
-        last_chat_message = c.message_set.all().latest('sent_date')
+        # last_chat_message = c.message_set.all().latest('sent_date')
 
         c.chat_name = chat_name
-        c.last_message = last_chat_message
+        # c.last_message = last_chat_message
 
 
     context = {'chats_page': chats_page}
     return render(request, 'im/chat_list_view.html', context=context)
     
 
-class ChatView(generic.ListView):
-    
-    def get(self, request, *args, **kwargs):
-        page = request.GET.get('page',1)
+class ChatMessagesView(generic.ListView):
 
-        chat = get_object_or_404(Chat, pk=kwargs['chat_id'])
-        user = request.user
+    context_object_name = 'messages'
+    paginate_by = 20
+    template_name = 'im/chat_messages_view.html'
+    model = Message
 
-        messages = chat.message_set.all().order_by('-sent_date')
-        paginator = Paginator(messages, 25)
-        messages_page = paginator.get_page(page)
 
-        context = { 
-            'messages_page': messages_page,
-            'companions': [u for u in chat.users.all() if u.username != user.username],
-            'chat': chat
-        }
-        return render(request, 'im/chat_view.html', context=context)
-    
-    
+    def get_queryset(self):
+        chat = get_object_or_404(Chat, pk=self.kwargs['chat_id'])
+        return Message.objects.filter(chat=chat)
+
+
+    def get_context_data(self, **kwargs):
+        chat = get_object_or_404(Chat, pk=self.kwargs['chat_id'])
+        companions = [u for u in chat.users.all() 
+                      if u.username != self.request.user.username]
+        
+        context = super().get_context_data(**kwargs)
+        context['chat'] = chat
+        context['companions'] = companions
+        return context
+
+
     def post(self, request, *args, **kwargs):
         chat = get_object_or_404(Chat, pk=kwargs['chat_id'])
         user = request.user
