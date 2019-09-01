@@ -5,18 +5,18 @@ from django.views import generic
 from django.utils import timezone
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
-from .models import Chat, Message
+from .models import Chat, Message, ChatToUser
 
 class ChatsView(generic.ListView):
 
-    context_object_name = 'chats'
+    context_object_name = 'chats_to_users'
     paginate_by = 20
     template_name = 'im/chat_list_view.html'
 
 
     def get_queryset(self):
         user = self.request.user
-        return user.chat_set.all()
+        return ChatToUser.objects.filter(user=user)
 
     
     def post(self, request, *args, **kwargs):
