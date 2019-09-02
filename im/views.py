@@ -49,7 +49,7 @@ class ChatsView(generic.ListView):
 
         users_chats_intersection = user1_chats & user2_chats
         return [c for c in users_chats_intersection 
-                            if set(c.users.all()) == set([user1, user2])]
+                if set(c.users.all()) == set([user1, user2])]
     
 
 class ChatMessagesView(generic.ListView):
